@@ -151,7 +151,7 @@ def iterate_population(mh, population, iter, maxIter, dim, fitness, best, vel=No
             new_population, posibles_mejoras = result
             new_vel = vel
          else:
-             raise TypeError(f"Retorno inesperado de {mh}. Se esperaba (population, posibles_mejoras), se obtuvo {type(result)}")
+            raise TypeError(f"Retorno inesperado de {mh}. Se esperaba (population, posibles_mejoras), se obtuvo {type(result)}")
     
     elif isinstance(result, tuple) and len(result) == 2: # Para PSO y otros
         new_population, new_vel = result

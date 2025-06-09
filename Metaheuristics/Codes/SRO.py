@@ -1,15 +1,25 @@
 import numpy as np
 
-def iterarSRO(maxIter, iter, dim, population, fitness, best, fo, lb, ub, vel):
+def make_fitness_function(func):
+    def temp(array):
+        result = []
+        for element in array:
+            result.append(func(element))
+        return np.array(result)  
+    return temp
+
+def iterarSRO(maxIter, iter, dim, population, fitness, best, fo, lb, ub):
     # 1. Algorithm parameters
     N = len(population)
+    maxIter = maxIter
+    ff = make_fitness_function(fo)
 
     k = 2e-5
     K_com = 2
     groupCount = 4
     C = 1.0
 
-    noImproveIter = vel[0]
+    # noImproveIter = 0 #vel[0]
 
     # 2. Group index initialization
     groupSize = N // groupCount
@@ -62,13 +72,13 @@ def iterarSRO(maxIter, iter, dim, population, fitness, best, fo, lb, ub, vel):
     delta = (c * F)[:, None] * angle
     omega = omega + k * delta[:, 0]
 
-    ship_vel += (omega[:, None]) * (ub - lb) * np.random.randn(N, dim)
+    ship_vel += (omega[:, None]) * np.random.randn(N, dim) # * (ub - lb)
 
     newPopulation = np.clip(population + C * (ship_vel + delta * np.random.randn(N, dim) * (best - population)), lb, ub)
-    mask = fo(newPopulation) < fo(population)
-    population[mask] = newPopulation[mask]
+    # indices = ff(newPopulation) < ff(population)
+    # population[indices] = newPopulation[indices]
 
-    noImproveIter = 0 if np.min(fo(population)) < fo(best) else noImproveIter + 1
-    vel[0] = noImproveIter
+    # noImproveIter = 0 if np.min(ff(population)) < ff(best) else noImproveIter + 1
+    # vel[0] = noImproveIter
 
-    return population, vel
+    return population
