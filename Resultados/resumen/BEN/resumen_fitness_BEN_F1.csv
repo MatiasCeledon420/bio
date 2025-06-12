@@ -1,3 +1,4 @@
 instance, best, avg. fitness, std fitness
-PSO, 2.98e-11, 0.0, 0.0
-WOA, 4.86e-17, 0.0, 0.0
+PSO, 1.46e-13, 0.0, 0.0
+WOA, 1e-20, 0.0, 0.0
+SRO, 115.0, 1621.667, 1622.631

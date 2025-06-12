@@ -1,84 +1,119 @@
 import numpy as np
+from scipy.special import gamma
+import math
 
-def make_fitness_function(func):
-    def temp(array):
-        result = []
-        for element in array:
-            result.append(func(element))
-        return np.array(result)  
-    return temp
+def equation_9(X_g_i, xBest_g, V_g_i, D_g_i, q9_c1, q9_c2, c, F):
+    angle_g_i = np.arccos(np.dot(X_g_i, xBest_g) / (np.linalg.norm(X_g_i) * np.linalg.norm(xBest_g)))
 
-def iterarSRO(maxIter, iter, dim, population, fitness, best, fo, lb, ub):
-    # 1. Algorithm parameters
+    D_g_i_new = D_g_i + c * F * angle_g_i
+    
+    D_g_i_new = np.clip(D_g_i_new, -np.pi, np.pi)
+
+    V_g_i_new = V_g_i + (q9_c1 * V_g_i * np.cos(D_g_i) - q9_c2 * (xBest_g - X_g_i))
+
+    X_g_i_new = xBest_g + q9_c1 * V_g_i_new * np.cos(D_g_i) - q9_c2 * (xBest_g - X_g_i)
+    
+    return X_g_i_new, V_g_i_new, D_g_i_new
+
+def equation_12(X_g_i, xBest_g, XBest, t, maxIter):
+    m = np.random.uniform(-1, 1)
+    
+    n_t = -t / (2 * np.pi * maxIter)
+    
+    distA_t = XBest - X_g_i
+    distB_t = xBest_g - X_g_i
+    
+    S1_t = m * n_t * np.cos(X_g_i) * distA_t
+    
+    S2_t = m * n_t * np.sin(X_g_i) * distB_t
+    
+    X_g_i_new = X_g_i + (S1_t + S2_t)
+    
+    return X_g_i_new
+
+def equation_17(X_g_i, XBest, dim):
+    # equation 19
+    beta=1.5
+    num = gamma(1 + beta) * np.sin(np.pi * beta / 2)
+    den = gamma((1 + beta) / 2) * beta * 2 ** ((beta - 1) / 2)
+    sigma = (num / den) ** (1 / beta)
+
+    # equation 18
+    u = np.random.normal(0, 1, size=dim)
+    v = np.random.normal(0, 1, size=dim)
+    stepsize = 0.01 * u * sigma / (np.abs(v) ** (1 / beta))
+
+    distB_t = XBest - X_g_i
+
+    return X_g_i + (np.pi / 3) * np.random.uniform(-1, 1) * distB_t * stepsize
+
+def equation_20(X_g_i, xBest_g, XBest):
+    m = np.random.uniform(-1, 1)
+    
+    distA_t = xBest_g - X_g_i
+    distB_t = XBest - X_g_i
+    
+    Q_t = distA_t - distB_t
+    
+    M_t = Q_t * X_g_i
+    
+    X_g_i_new = m * Q_t * np.cos(X_g_i) + distA_t * np.cos(M_t)
+    
+    return X_g_i_new
+
+def equation_23(X_g_i, xBest_g, XBest, q23_C1, q23_C2):
+    return X_g_i + q23_C1 * (xBest_g - X_g_i) + q23_C2 * (XBest - X_g_i)
+
+def iterarSRO(maxIter, iter, dim, population, best, fo, vel, userData):
     N = len(population)
-    maxIter = maxIter
-    ff = make_fitness_function(fo)
-
-    k = 2e-5
-    K_com = 2
     groupCount = 4
-    C = 1.0
-
-    # noImproveIter = 0 #vel[0]
-
-    # 2. Group index initialization
-    groupSize = N // groupCount
-    remainder = N % groupCount
     groups = []
-    start_idx = 0
 
     for g in range(groupCount):
-        current_size = groupSize + (remainder if g == groupCount - 1 else 0)
-        end_idx = start_idx + current_size
-        groups.append(np.arange(start_idx, end_idx))
-        start_idx = end_idx
+        groupSize = math.trunc(N / groupCount)
+        groups.append(np.arange(g*groupSize, g*groupSize + ( (N % groupCount if g == groupCount - 1 else groupSize) )))
 
-    # 3. Variable initialization
-    F = 2 * np.random.randint(0, 2, N) - 1
-    omega = np.zeros(N)
-    delta = np.zeros((N, dim))
-    angle = np.zeros((N, dim))
-    ship_vel = np.zeros((N, dim))
+    if not userData:
+        userData["no_change_counter"] = 0
+    
+    # equation 23 constants
+    q23_C1, q23_C2 = np.random.uniform(0, 2, 2)
 
-    # 4. Group communication
+    # equation 9 constants
+    q9_c1 = np.random.uniform(0, 1)
+    q9_c2 = np.random.uniform(-1, 1)
+    c = np.random.uniform(-2, 2)
+    F = np.random.choice([1, -1])
+
+    V_g_i = np.zeros_like(population[0])
+    D_g_i = np.zeros_like(population[0])
+    
     if iter % 20 == 0:
         for g in range(groupCount):
-            indices = groups[g]
+            np.arange(g*groupCount, g*groupCount + ( (N % groupCount if g == groupCount - 1 else groupCount) ))
+            worst_ships = groups[g][np.argsort([fo(ship)[1] for ship in population[groups[g]]])[-3:]]
+            for i in worst_ships:
+                population[i] = equation_23(population[i], min(population[groups[g]], key=lambda x: fo(x)[1]), best, q23_C1, q23_C2)
+    
+    if userData["no_change_counter"] >= 10:
+        for i in range(N):
+            population[i], V_g_i, D_g_i = equation_9(population[i], min(population[groups[g]], key=lambda x: fo(x)[1]), V_g_i, D_g_i, q9_c1, q9_c2, c, F)
+    else:
+        for i in range(N):
+            g = math.trunc(i / groupCount)
+            if 1 <= i <= N / 2:
+                population[i] = equation_12(population[i], min(population[groups[g]], key=lambda x: fo(x)[1]), best, iter, maxIter)
+            elif N / 2 < i <= 0.9 * N:
+                population[i] = equation_17(population[i], best, dim)
+            else:
+                population[i] = equation_20(population[i], min(population[groups[g]], key=lambda x: fo(x)[1]), best)
 
-            g_pos = population[indices, :]
-            g_fitness = fitness[indices]
-            g_best = g_pos[np.argmin(g_fitness)]
+    newBest = best
 
-            worst_indices = np.argsort(-g_fitness)[:int(np.ceil(len(indices) / 3))]
-            c1 = K_com * np.random.rand()
-            c2 = K_com * np.random.rand()
-
-            for w in worst_indices:
-                idx = indices[w]
-
-                population[idx, :] = np.clip(population[idx, :] + (
-                    c1 * (g_best - population[idx, :]) +
-                    c2 * (best  - population[idx, :])
-                ), lb, ub)
-
-    # 5. Ship movement
-    for i in range(N):
-        if np.linalg.norm(population[i, :]) > 0 and np.linalg.norm(best) > 0:
-            cos_angle = np.dot(population[i, :], best) / (np.linalg.norm(population[i, :]) * np.linalg.norm(best))
-            cos_angle = np.clip(cos_angle, -1, 1)
-            angle[i, :] = np.arccos(cos_angle)
-
-    c = -2 + 4 * np.random.rand(N)
-    delta = (c * F)[:, None] * angle
-    omega = omega + k * delta[:, 0]
-
-    ship_vel += (omega[:, None]) * np.random.randn(N, dim) # * (ub - lb)
-
-    newPopulation = np.clip(population + C * (ship_vel + delta * np.random.randn(N, dim) * (best - population)), lb, ub)
-    # indices = ff(newPopulation) < ff(population)
-    # population[indices] = newPopulation[indices]
-
-    # noImproveIter = 0 if np.min(ff(population)) < ff(best) else noImproveIter + 1
-    # vel[0] = noImproveIter
+    # see if best fitness change
+    if fo(newBest)[1] <= fo(best)[1]:
+        userData["no_change_counter"] += 1
+    else:
+        userData["no_change_counter"] = 0
 
     return population

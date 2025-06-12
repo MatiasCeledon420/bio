@@ -1,0 +1,4 @@
+instance, min time (s), avg. time (s), std time (s)
+PSO, 0.023, 0.035, 0.006
+WOA, 0.028, 0.043, 0.009
+SRO, 0.052, 0.063, 0.005

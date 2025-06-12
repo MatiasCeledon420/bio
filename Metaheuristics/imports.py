@@ -108,7 +108,7 @@ MH_ARG_MAP = {
     'SCA':   ('maxIter', 'iter', 'population', 'best'),
     'SHO':   ('maxIter', 'iter', 'dim', 'population', 'best', 'fo', 'objective_type'),
              
-    'SRO':   ('maxIter', 'iter', 'dim', 'population', 'fitness', 'best', 'fo', 'lb', 'ub'),
+    'SRO':   ('maxIter', 'iter', 'dim', 'population', 'best', 'fo', 'vel', 'userData'),
 
     # T
     'TDO':   ('maxIter', 'iter', 'dim', 'population', 'fitness', 'fo', 'objective_type'),
