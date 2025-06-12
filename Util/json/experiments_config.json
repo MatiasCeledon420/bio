@@ -20,17 +20,18 @@
 
     "dimensiones": {
         "BEN": {
-            "F1": [3], "F2": [3], "F3": [3], "F4": [3], "F5": [3], "F6": [3],
-            "F7": [3], "F8": [3], "F9": [3], "F10": [3], "F11": [30], "F12": [30], "F13": [30],
-            "F14": [2], "F15": [4], "F16": [2], "F17": [2], "F18": [2],
-            "F19": [3], "F20": [6], "F21": [4], "F22": [4], "F23": [4]
+            "F1" : [5 ], "F2" : [5 ], "F3" : [5 ], "F4" : [14], "F5" : [14],
+            "F6" : [14], "F7" : [14], "F8" : [30], "F9" : [30], "F10": [30],
+            "F11": [30], "F12": [30], "F13": [30], "F14": [2 ], "F15": [4 ],
+            "F16": [2 ], "F17": [2 ], "F18": [2 ], "F19": [3 ], "F20": [6 ],
+            "F21": [4 ], "F22": [4 ], "F23": [4 ]
         }
     },
 
     "experimentos": {
-        "BEN":  {"iteraciones": 100, "poblacion": 10, "num_experimentos": 1},
-        "SCP":  {"iteraciones": 100, "poblacion": 10, "num_experimentos": 1},
-        "USCP": {"iteraciones": 100, "poblacion": 10, "num_experimentos": 1}
+        "BEN":  {"iteraciones": 100, "poblacion": 10, "num_experimentos": 11},
+        "SCP":  {"iteraciones": 100, "poblacion": 10, "num_experimentos": 11},
+        "USCP": {"iteraciones": 100, "poblacion": 10, "num_experimentos": 11}
     },
 
     "instancias": {
