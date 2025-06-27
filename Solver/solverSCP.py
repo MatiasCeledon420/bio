@@ -63,6 +63,8 @@ def solverSCP(id, mh, maxIter, pop, instances, DS, repairType, param, unicost):
     
     if mh == 'PO':
         iterarPO = IterarPO(fo, instance.getColumns(), pop, maxIter, 0, 1)
+
+    userData = {}
         
     for iter in range(1, maxIter + 1):
         # obtengo mi tiempo inicial
@@ -90,7 +92,8 @@ def solverSCP(id, mh, maxIter, pop, instances, DS, repairType, param, unicost):
             vel=vel,
             pBest=pBest,
             fo=fo,
-            param=param
+            param=param,
+            userData=userData # 13
         )
         
         # Binarizo, calculo de factibilidad de cada individuo y calculo del fitness

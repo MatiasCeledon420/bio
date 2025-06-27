@@ -10,13 +10,13 @@
         "instancias": "Identificadores de los instancias de los problemas que se van a procesar."
     },
 
-    "ben": true,
-    "scp": false,
+    "ben": false,
+    "scp": true,
     "uscp": false,
     
-    "mhs": ["PSO", "WOA", "SRO"],
+    "mhs": ["SRO", "PSO", "WOA"],
     
-    "DS_actions": ["V3-STD", "V3-ELIT"],
+    "DS_actions": ["V3-STD"],
 
     "dimensiones": {
         "BEN": {
@@ -29,14 +29,14 @@
     },
 
     "experimentos": {
-        "BEN":  {"iteraciones": 100, "poblacion": 10, "num_experimentos": 11},
-        "SCP":  {"iteraciones": 100, "poblacion": 10, "num_experimentos": 11},
-        "USCP": {"iteraciones": 100, "poblacion": 10, "num_experimentos": 11}
+        "BEN":  {"iteraciones": 100, "poblacion": 13, "num_experimentos": 11},
+        "SCP":  {"iteraciones": 100, "poblacion": 13, "num_experimentos": 11},
+        "USCP": {"iteraciones": 100, "poblacion": 13, "num_experimentos": 11}
     },
 
     "instancias": {
         "BEN": ["F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8", "F9", "F10"],
-        "SCP": ["41"],
+        "SCP": ["41", "51", "61"],
         "USCP": ["uclr10"]
     }
 }

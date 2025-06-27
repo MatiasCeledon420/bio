@@ -1,0 +1,4 @@
+instance, best, avg. fitness, std fitness
+SRO, 433.0, 433.273, 0.445
+PSO, 435.0, 436.0, 0.603
+WOA, 433.0, 434.091, 1.443
